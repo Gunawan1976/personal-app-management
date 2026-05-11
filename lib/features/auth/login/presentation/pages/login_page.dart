@@ -57,6 +57,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Login berhasil")),
             );
+            print("Login berhasil");
 
             context.go('/home');
           }

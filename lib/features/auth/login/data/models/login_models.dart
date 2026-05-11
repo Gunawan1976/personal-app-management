@@ -42,7 +42,7 @@ class LoginModel extends LoginEntities{
         lastName: json["lastName"],
         gender: json["gender"],
         image: json["image"],
-        accessToken: json["accessToken"],
+        accessToken: json["accessToken"] ?? json["token"], // Fallback to 'token' for dummyjson
         refreshToken: json["refreshToken"],
     );
 

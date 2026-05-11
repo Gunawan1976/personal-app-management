@@ -4,18 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/router/router.dart';
 import 'core/utils/util_helper.dart';
-import 'core/network/token_cache.dart';
-import 'core/utils/storage/secure_storage_util.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // const String key = String.fromEnvironment('KEY', defaultValue: 'dev-key');
-  // const String iv = String.fromEnvironment('IV', defaultValue: 'dev-iv');
-  //
-  // await UserSecureStorage.setField("sec_key", key);
-  // await UserSecureStorage.setField("iv", iv);
-  // await TokenCache.init();
 
   runApp(
     const ProviderScope(
@@ -29,7 +20,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = ref.read(goRouterProvider);
+    // Gunakan ref.watch agar MaterialApp mendapatkan instance router terbaru
+    // saat authSessionProvider berubah dan memicu pembuatan ulang goRouterProvider.
+    final router = ref.watch(goRouterProvider);
 
     return ScreenUtilInit(
       designSize: const Size(360, 690),

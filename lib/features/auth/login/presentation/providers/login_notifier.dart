@@ -29,29 +29,33 @@ class LoginNotifier extends AsyncNotifier<DataState<LoginEntities>> {
     state = const AsyncLoading();
 
     final result = await AsyncValue.guard(() async {
-      return await ref.read(loginUseCaseProvider).loginRepository.login(
+      final loginResult = await ref.read(loginUseCaseProvider).loginRepository.login(
         id: id,
         password: password,
         captcha: captcha,
         captchaId: captchaId,
         csrfToken: csrfToken,
       );
+
+      // Simpan session SEBELUM mengupdate state loginNotifier ke success
+      // agar saat listener di UI terpanggil, isAuthenticated sudah bernilai true.
+      if (loginResult is DataSuccess<LoginEntities>) {
+        final data = loginResult.data;
+        final accessToken = data?.accessToken;
+        final refreshToken = data?.refreshToken;
+
+        if (accessToken != null && refreshToken != null) {
+          await ref.read(authSessionProvider.notifier).setLogin(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+          );
+        }
+      }
+
+      return loginResult;
     });
 
     state = result;
-
-    if (result.value is DataSuccess<LoginEntities>) {
-      final data = (result.value as DataSuccess<LoginEntities>).data;
-      final accessToken = data?.accessToken;
-      final refreshToken = data?.refreshToken;
-      
-      if (accessToken != null && refreshToken != null) {
-        await ref.read(authSessionProvider.notifier).setLogin(
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-        );
-      }
-    }
   }
 
   Future<void> logout() async {
